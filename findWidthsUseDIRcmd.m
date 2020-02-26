@@ -1,18 +1,20 @@
 clearvars
 close all
 
+% The only files in the folder should be .bmp files which are images of the light sheet taken at different positions. Each image should
+% be separated by the same amount; input that amount as the variable "imgSep".
 f = dir;
 for i=1:length(f)-2
     filename{i} = f(i+2).name;
 end
-path = [f(3).folder,'\'];% 'C:\Users\Mark\Documents\Documents\School\DTU\Radiometer\Thesis\fluoresence imaging\25Nov2019\charaterize sheet\';
+path = [f(3).folder,'\'];
 
 sheetHorizontal = 0; % 1 if sheet is oriented horizontally. 0 otherwise.
 
 yStart = 0; % The y-axis reading of the first image minus 0.1
 imgSep = 0.1; % The z distance in mm between ea img.
 
-% the horizontal region containing non-zero values.
+% The region containing non-zero values. The ones already below are for images taken on the dates listed.
 % sheetRegion=701:2050; % 20NOV, vertical region containing sheet. Sheet is HORIZONTAL.
 % sheetRegion=524:2024; % 25NOV, vertical region containing sheet. Sheet is HORIZONTAL.
 % sheetRegion=501:1700; % 29JAN, vertical region containing sheet. Sheet is HORIZONTAL.
@@ -61,12 +63,12 @@ for i=1:N
 end
 [ImaxSorted,iSorted]=sort(Imax,'ascend'); % Sort by brightest intensity, which corrseponds to most in focus
 indMaxSorted = indMax(iSorted);
-center = round(mean(indMaxSorted(1:4))*numPixelsAvg); % Find the center of the bright region 
-                                  % of the sheet by averaging the 5 most in focus images.
+center = round(mean(indMaxSorted(1:5))*numPixelsAvg); % Find the center of the bright region 
+                                                      % of the sheet by averaging the 5 most in focus images.
 pixel = 2.4; %Second CMOS:2.4;%First CMOS:1.67; % [um] pixel size
 x = (1:L)'*pixel; % length scale from pixels to micrometers
 
-sheetWidth = round(1000/pixel); % 900 pixels is approx 1.5mm for the 1st CMOS
+sheetWidth = round(1500/pixel); % 900 pixels is approx 1.5mm for the 1st CMOS
 startSheet = center - sheetWidth/2; % The vertical height to start considering the sheet
 
 stp = 30; % How big of a step to take between measuring widths of intensity profiles
