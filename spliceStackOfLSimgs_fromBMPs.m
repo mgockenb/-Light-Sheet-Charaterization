@@ -1,11 +1,14 @@
 clearvars
 close all
 
-%Visualize the light sheet along the z-axis. The camera of course takes
-%images in the xy-plane, so in order to see the third dimension, must
-%interpolate the intensity between the pictures. 
+% No user defined functions needed unless you don't want to use the 'dir' command.
+% Visualize the light sheet along the z-axis. The camera, of course, takes
+% images in the xy-plane, so in order to see the third dimension, must
+% interpolate the intensity between the pictures. 
+% Must be in the folder with only the .bmp pics of the LS.
 
-useDir = 1; %Us the 'dir' function when you are in the correct directory
+pixel = 1.67; % [um] pitch of camera pixels
+useDir = 1;   % Use the 'dir' function when you are in the correct directory
 sheetHorizontal = 1; % 1 if sheet is oriented horizontally. 0 otherwise.
 
 % the horizontal region containing non-zero values.
@@ -20,7 +23,7 @@ if useDir==1
     for i=1:length(f)-2
         filename(i,:) = f(i+2).name;
     end
-    path = 'C:\Users\Mark\Documents\Documents\School\DTU\Radiometer\Thesis\Characterize sheet\20Nov2019\images\';
+    path = f(1).folder;
 else
     [path,filename] = LoadFilenames04NOV_2pixel;
 end
@@ -67,9 +70,11 @@ end
 [ImaxSorted,iSorted]=sort(Imax,'ascend'); % Sort by brightest intensity, which corrseponds to most in focus
 indMaxSorted = indMax(iSorted);
 center = round(mean(indMaxSorted(1:5))*numPixelsAvg); % Find the center of the bright region 
-                                  % of the sheet by averaging the 5 most in focus images.
+                                                      % of the sheet by averaging the 5 most in focus images.
 
-I = zeros(N*60-59,length(sheetRegion)+1000); % Each image is taken 100um apart, which corresponds to 60 camera pixels                      
+s = round(100/pixel);  % The number of camera pixels separating each image in the folder. Each image is taken 100um apart.
+
+I = zeros(N*(s-1) + 1,length(sheetRegion)+1000);                      
 
 for i=1:N
     I(60*(i-1)+1,501:(end-500)) = B(center,sheetRegion,i);
@@ -94,7 +99,7 @@ for j=1:(h-1)
         col_o = col_f;
     end
     
-    if r((j+1))>r(j) && col_o+(colB-colT)<= (length(sheetRegion)+1000) 
+    if r((j+1))>r(j) && col_o+(colB-colT) <= (length(sheetRegion)+1000) 
         col_f = col_o + round(slopeCols*(r(j+1)-r(j)));
         delta(j) = I(r((j+1)),col_f) - I(r(j),col_o);
         slope(j) = delta(j)/(r((j+1))-r(j));
